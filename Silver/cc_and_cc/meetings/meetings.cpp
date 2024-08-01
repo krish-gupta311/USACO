@@ -21,9 +21,10 @@ typedef vector<pair<int,int>> vpi;
 int N,L;
 vi w,x,d;
 
+ifstream fin("meetings.in");
+ofstream fout("meetings.out");
+
 void init() {
-    ifstream fin("meetings.in");
-    ofstream fout("meetings.out");
     fin >> N >> L;
     w.rsz(N), x.rsz(N), d.rsz(N);
     F0R(i,N) fin >> w[i] >> x[i] >> d[i];
@@ -67,6 +68,6 @@ int main() {
             ans += sz(rig);
         } else rig.push(x[i]);
     }
-    cout << ans << "\n";
+    fout << ans << "\n";
     return 0;
 }
