@@ -64,6 +64,7 @@
 
 #include <bits/stdc++.h>
 using namespace std;
+
 typedef long long ll;
 
 struct Cow {
@@ -71,63 +72,77 @@ struct Cow {
     int w, d;
 };
 
-int main() {
-    ifstream fin("meetings.in");
-    ofstream fout("meetings.out");
+ifstream fin("meetings.in");
+ofstream fout("meetings.out");
 
-    int N, L;
+void readInput(int& N, int& L, vector<Cow>& cows) {
     fin >> N >> L;
-
-    vector<Cow> cows(N);
-    ll total_weight = 0;
+    cows.resize(N);
     for (int i = 0; i < N; i++) {
         fin >> cows[i].x >> cows[i].w >> cows[i].d;
-        total_weight += cows[i].w;
     }
+}
 
-    // Separate left-moving and right-moving cows
-    vector<pair<ll, int>> left, right;
-    for (int i = 0; i < N; i++) {
-        if (cows[i].d == -1) {
-            left.emplace_back(cows[i].x, cows[i].w);
+ll calculateTotalWeight(const vector<Cow>& cows) {
+    ll total_weight = 0;
+    for (const auto& cow : cows) {
+        total_weight += cow.w;
+    }
+    return total_weight;
+}
+
+ll determineT(int N, int L, const vector<Cow>& cows, ll total_weight) {
+    vector<pair<ll, int>> events;
+    for (const auto& cow : cows) {
+        if (cow.d == -1) {
+            events.emplace_back(cow.x, cow.w);
         } else {
-            right.emplace_back(L - cows[i].x, cows[i].w);
+            events.emplace_back(L - cow.x, cow.w);
         }
     }
 
-    // Combine and sort by position for getting T
-    vector<pair<ll, int>> events;
-    events.insert(events.end(), left.begin(), left.end());
-    events.insert(events.end(), right.begin(), right.end());
     sort(events.begin(), events.end());
 
-    ll T = 0;
     ll weight = total_weight;
     for (const auto& event : events) {
         weight -= 2 * event.second;
         if (weight <= 0) {
-            T = event.first;
-            break;
+            return event.first;
         }
     }
+    return 0;
+}
 
-    // Sort cows by position x
-    sort(cows.begin(), cows.end(), [](Cow a, Cow b) { return a.x < b.x; });
-
-    // Count meetings
-    ll meetings = 0;
+int countMeetings(int N, ll T, const vector<Cow>& cows) {
     queue<ll> right_moving_cows;
-    for (int i = 0; i < N; i++) {
-        if (cows[i].d == 1) {
-            right_moving_cows.push(cows[i].x);
+    int meetings = 0;
+
+    for (const auto& cow : cows) {
+        if (cow.d == 1) {
+            right_moving_cows.push(cow.x);
         } else {
-            while (!right_moving_cows.empty() && right_moving_cows.front() + 2 * T < cows[i].x) {
+            while (!right_moving_cows.empty() && right_moving_cows.front() + 2 * T < cow.x) {
                 right_moving_cows.pop();
             }
             meetings += right_moving_cows.size();
         }
     }
+    return meetings;
+}
 
-    fout << meetings << endl;
+int main() {
+
+    int N, L;
+    vector<Cow> cows;
+    readInput(N, L, cows);
+
+    ll total_weight = calculateTotalWeight(cows);
+    ll T = determineT(N, L, cows, total_weight);
+
+    sort(cows.begin(), cows.end(), [](Cow a, Cow b) { return a.x < b.x; });
+
+    int meetings = countMeetings(N, T, cows);
+    fout << meetings << "\n";
+
     return 0;
 }
