@@ -65,72 +65,83 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-typedef long long ll;
-typedef vector<int> vi; 
-typedef vector<pair<int,int>> vpi; 
-
-#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
-#define F0R(i,a) FOR(i,0,a)
-#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
-#define R0F(i,a) ROF(i,0,a)
-#define trav(a,x) for (auto& a: x)
-
-#define pb push_back
-#define rsz resize
-#define sz(x) int(x.size())
-#define all(x) begin(x), end(x)
-#define f first
-#define s second
-
 ifstream fin("meetings.in");
 ofstream fout("meetings.out");
 
 int N,L;
-vi w,x,d;
+vector<int> w,x,d;
 
 void init() {
+    
     fin >> N >> L;
-    w.rsz(N), x.rsz(N), d.rsz(N);
-    F0R(i,N) fin >> w[i] >> x[i] >> d[i];
-    vi inds(N); iota(all(inds),0);
-    sort(all(inds),[](int a, int b) { return x[a] < x[b]; });
-    vi W,X,D;
-    trav(t,inds) {
-        W.pb(w[t]);
-        X.pb(x[t]);
-        D.pb(d[t]);
+
+    w.resize(N);
+    x.resize(N);
+    d.resize(N);
+    for (int i = 0; i < N; i++) {
+        fin >> x[i] >> w[i] >> d[i];
+    }
+    
+    vector<int> inds(N);
+    for (int i = 0; i < N; i++) {
+        inds[i] = i;
+    }
+    sort(inds.begin(),inds.end(),[](int a, int b) { return x[a] < x[b]; });
+    vector<int> W,X,D;
+    for (int t : inds) {
+        W.push_back(w[t]);
+        X.push_back(x[t]);
+        D.push_back(d[t]);
     }
     swap(w,W), swap(x,X), swap(d,D);
 }
 
 int getTime() {
-    vi lef, rig;
-    F0R(i,N) {
-        if (d[i] == -1) lef.pb(x[i]);
-        else rig.pb(x[i]);
+    vector<int> left, right;
+    for (int i = 0; i < N; i++) {
+        if (d[i] == -1) {
+            left.push_back(x[i]);
+        }
+        else {
+            right.push_back(x[i]);
+        }
     }
-    vpi v;
-    F0R(i,sz(lef)) v.pb({lef[i],w[i]});
-    F0R(i,sz(rig)) v.pb({L-rig[i],w[sz(lef)+i]});
-    sort(all(v));
-    int tot = 0; trav(t,v) tot += t.s;
-    trav(t,v) {
-        tot -= 2*t.s;
-        if (tot <= 0) return t.f;
-    } return 0;
+    vector<pair<int,int> > v;
+    for (int i = 0; i < left.size(); i++) {
+        v.push_back({left[i],w[i]});
+    }
+    for (int i = 0; i < right.size(); i++) {
+        v.push_back({L-right[i],w[left.size()+i]});
+    }
+    sort(v.begin(),v.end(), [](pair<int,int> a, pair<int,int> b) { return a.first < b.first; });
+    int total_weight = 0;
+    for (auto t : v) {
+        total_weight += t.second;
+    }
+    for (auto t : v) {
+        total_weight -= 2*t.second;
+        if (total_weight <= 0) {
+            return t.first;
+        }
+    } 
+    return 0;
 }
 
 int main() {
     init();
-    int t = getTime(); 
-    queue<int> rig;
-    int ans = 0;
-    F0R(i,N) {
+    int T = getTime(); 
+    queue<int> right;
+    int meetings = 0;
+    for (int i = 0; i < N; i++) {
         if (d[i] == -1) {
-            while (sz(rig) && rig.front()+2*t < x[i]) rig.pop();
-            ans += sz(rig);
-        } else rig.push(x[i]);
+            while (!right.empty() && (x[i] - right.front())/2 > T) {
+                right.pop();
+            }
+            meetings += right.size();
+        } else { 
+            right.push(x[i]);
+        }
     }
-    fout << ans << "\n";
+    fout << meetings << "\n";
     return 0;
 }
