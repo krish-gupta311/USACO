@@ -67,13 +67,13 @@ using namespace std;
 
 typedef long long ll;
 typedef vector<int> vi; 
-typedef vector<pair<int, int>> vpi;
+typedef vector<pair<int,int>> vpi; 
 
-#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
-#define F0R(i, a) FOR(i, 0, a)
-#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
-#define R0F(i, a) ROF(i, 0, a)
-#define trav(a, x) for (auto& a: x)
+#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
+#define F0R(i,a) FOR(i,0,a)
+#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i,a) ROF(i,0,a)
+#define trav(a,x) for (auto& a: x)
 
 #define pb push_back
 #define rsz resize
@@ -85,78 +85,52 @@ typedef vector<pair<int, int>> vpi;
 ifstream fin("meetings.in");
 ofstream fout("meetings.out");
 
-void readInput(int& N, int& L, vi& x, vi& w, vi& d) {
+int N,L;
+vi w,x,d;
+
+void init() {
     fin >> N >> L;
-    x.rsz(N);
-    w.rsz(N);
-    d.rsz(N);
-    F0R(i, N) fin >> x[i] >> w[i] >> d[i];
+    w.rsz(N), x.rsz(N), d.rsz(N);
+    F0R(i,N) fin >> w[i] >> x[i] >> d[i];
+    vi inds(N); iota(all(inds),0);
+    sort(all(inds),[](int a, int b) { return x[a] < x[b]; });
+    vi W,X,D;
+    trav(t,inds) {
+        W.pb(w[t]);
+        X.pb(x[t]);
+        D.pb(d[t]);
+    }
+    swap(w,W), swap(x,X), swap(d,D);
 }
 
-ll calculateTotalWeight(const vi& w) {
-    ll total_weight = 0;
-    trav(weight, w) total_weight += weight;
-    return total_weight;
-}
-
-ll determineT(int N, int L, const vi& x, const vi& w, const vi& d, ll total_weight) {
+int getTime() {
     vi lef, rig;
-    F0R(i, N) {
+    F0R(i,N) {
         if (d[i] == -1) lef.pb(x[i]);
         else rig.pb(x[i]);
     }
-
-    vpi events;
-    F0R(i, sz(lef)) events.pb({lef[i], w[i]});
-    F0R(i, sz(rig)) events.pb({L - rig[i], w[sz(lef) + i]});
-
-    sort(all(events));
-    ll weight = total_weight;
-    trav(event, events) {
-        weight -= 2 * event.s;
-        if (weight <= 0) return event.f;
-    }
-    return 0;
-}
-
-int countMeetings(int N, ll T, const vi& x, const vi& d) {
-    queue<ll> right_moving_cows;
-    int meetings = 0;
-
-    F0R(i, N) {
-        if (d[i] == 1) {
-            right_moving_cows.push(x[i]);
-        } else {
-            while (!right_moving_cows.empty() && right_moving_cows.front() + 2 * T < x[i]) {
-                right_moving_cows.pop();
-            }
-            meetings += sz(right_moving_cows);
-        }
-    }
-    return meetings;
+    vpi v;
+    F0R(i,sz(lef)) v.pb({lef[i],w[i]});
+    F0R(i,sz(rig)) v.pb({L-rig[i],w[sz(lef)+i]});
+    sort(all(v));
+    int tot = 0; trav(t,v) tot += t.s;
+    trav(t,v) {
+        tot -= 2*t.s;
+        if (tot <= 0) return t.f;
+    } return 0;
 }
 
 int main() {
-
-    int N, L;
-    vi x, w, d;
-    readInput(N, L, x, w, d);
-
-    ll total_weight = calculateTotalWeight(w);
-    ll T = determineT(N, L, x, w, d, total_weight);
-
-    vpi cows(N);
-    F0R(i, N) cows[i] = {x[i], d[i]};
-    sort(all(cows), [](pair<int, int> a, pair<int, int> b) { return a.first < b.first; });
-
-    vi x_sorted(N), d_sorted(N);
-    F0R(i, N) {
-        x_sorted[i] = cows[i].first;
-        d_sorted[i] = cows[i].second;
+    init();
+    int t = getTime(); 
+    queue<int> rig;
+    int ans = 0;
+    F0R(i,N) {
+        if (d[i] == -1) {
+            while (sz(rig) && rig.front()+2*t < x[i]) rig.pop();
+            ans += sz(rig);
+        } else rig.push(x[i]);
     }
-
-    int meetings = countMeetings(N, T, x_sorted, d_sorted);
-    fout << meetings << "\n";
-
+    fout << ans << "\n";
     return 0;
 }
