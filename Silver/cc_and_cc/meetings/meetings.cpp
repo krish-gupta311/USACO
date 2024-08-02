@@ -52,7 +52,7 @@ int main() {
         if (cows[i].d == 1) {
             right_moving_cows.push(cows[i]);
         } else {
-            while (!right_moving_cows.empty() && (cows[i].x - right_moving_cows.front().x)/2 > T) {
+            while (!right_moving_cows.empty() && right_moving_cows.front().x + 2 * T < cows[i].x) {
                 right_moving_cows.pop();
             }
             meetings += right_moving_cows.size();
