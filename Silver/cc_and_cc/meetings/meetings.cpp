@@ -66,73 +66,68 @@
 using namespace std;
 typedef long long ll;
 
-ifstream fin("meetings.in");
-ofstream fout("meetings.out");
-
 struct Cow {
     ll x;
     int w, d;
 };
 
 int main() {
+    ifstream fin("meetings.in");
+    ofstream fout("meetings.out");
+
     int N, L;
     fin >> N >> L;
 
-    ll total_weight = 0;
     vector<Cow> cows(N);
+    ll total_weight = 0;
     for (int i = 0; i < N; i++) {
         fin >> cows[i].x >> cows[i].w >> cows[i].d;
         total_weight += cows[i].w;
     }
 
-    // Sort cows by position x
-    sort(cows.begin(), cows.end(), [](Cow a, Cow b) { return a.x < b.x; });
-
     // Separate left-moving and right-moving cows
-    vector<pair<ll, int>> lef, rig;
+    vector<pair<ll, int>> left, right;
     for (int i = 0; i < N; i++) {
         if (cows[i].d == -1) {
-            lef.emplace_back(cows[i].x, cows[i].w);
+            left.emplace_back(cows[i].x, cows[i].w);
         } else {
-            rig.emplace_back(L - cows[i].x, cows[i].w);
+            right.emplace_back(L - cows[i].x, cows[i].w);
         }
     }
 
     // Combine and sort by position for getting T
-    vector<pair<ll, int>> v;
-    v.insert(v.end(), lef.begin(), lef.end());
-    v.insert(v.end(), rig.begin(), rig.end());
-    sort(v.begin(), v.end());
-
-    ll tot = 0;
-    for (const auto& t : v) {
-        tot += t.second;
-    }
+    vector<pair<ll, int>> events;
+    events.insert(events.end(), left.begin(), left.end());
+    events.insert(events.end(), right.begin(), right.end());
+    sort(events.begin(), events.end());
 
     ll T = 0;
-    for (const auto& t : v) {
-        tot -= 2 * t.second;
-        if (tot <= 0) {
-            T = t.first;
+    ll weight = total_weight;
+    for (const auto& event : events) {
+        weight -= 2 * event.second;
+        if (weight <= 0) {
+            T = event.first;
             break;
         }
     }
 
-    // Counting meetings
-    queue<ll> right_moving_positions;
+    // Sort cows by position x
+    sort(cows.begin(), cows.end(), [](Cow a, Cow b) { return a.x < b.x; });
+
+    // Count meetings
     ll meetings = 0;
-    for (const auto& cow : cows) {
-        if (cow.d == 1) {
-            right_moving_positions.push(cow.x);
+    queue<ll> right_moving_cows;
+    for (int i = 0; i < N; i++) {
+        if (cows[i].d == 1) {
+            right_moving_cows.push(cows[i].x);
         } else {
-            while (!right_moving_positions.empty() && right_moving_positions.front() + 2 * T < cow.x) {
-                right_moving_positions.pop();
+            while (!right_moving_cows.empty() && right_moving_cows.front() + 2 * T < cows[i].x) {
+                right_moving_cows.pop();
             }
-            meetings += right_moving_positions.size();
+            meetings += right_moving_cows.size();
         }
     }
 
     fout << meetings << endl;
-
     return 0;
 }
