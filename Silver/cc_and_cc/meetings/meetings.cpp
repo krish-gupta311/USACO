@@ -86,7 +86,7 @@ int main() {
         total_weight += cows[i].w;
     }
 
-    sort(cows.begin(), cows.end(), [](Cow a, Cow b) { return a.x < b.x; });
+    sort(cows.begin(), cows.end(), [](const Cow &a, const Cow &b) { return a.x < b.x; });
 
     // get the cows that start off going to the left & right
     vector<Cow> left;
@@ -114,7 +114,7 @@ int main() {
     }
 
     // sort them by their occurrence
-    sort(weight_times.begin(), weight_times.end(),[]( pair<int, int> a, pair<int, int> b) { return a.first < b.first; });
+    sort(weight_times.begin(), weight_times.end(),[]( const pair<int, int> &a, const pair<int, int> &b) { return a.first < b.first; });
 
     int T = -1;
     for (auto z : weight_times) {
