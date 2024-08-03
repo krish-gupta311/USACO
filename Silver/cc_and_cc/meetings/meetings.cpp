@@ -102,11 +102,11 @@ int main() {
 
     // Calculate the times when cows meet the ends of the barn
     vector<pair<int, int>> weight_times;
-    for (const Cow &cow : left) {
-        weight_times.push_back({cow.x, cow.w});
+    for (int i = 0; i < left.size(); i++) {
+        weight_times.push_back({left[i].x, cows[i].w});
     }
-    for (const Cow &cow : right) {
-        weight_times.push_back({L - cow.x, cow.w});
+    for (int i = 0; i < right.size(); i++) {
+        weight_times.push_back({L - right[i].x, cows[left.size()+i].w});
     }
 
     // Sort them by their occurrence
