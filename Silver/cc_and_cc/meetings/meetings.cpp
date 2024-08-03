@@ -83,7 +83,7 @@ int main() {
     int total_weight = 0;
     for (int i = 0; i < N; i++) {
         fin >> cows[i].x >> cows[i].w >> cows[i].d;
-        total_weight += cows[i].x;
+        total_weight += cows[i].w;
     }
 
     sort(cows.begin(), cows.end(), [](Cow a, Cow b) { return a.x < b.x; });
