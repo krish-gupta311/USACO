@@ -65,83 +65,87 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-ifstream fin("meetings.in");
-ofstream fout("meetings.out");
-
-int N,L;
-vector<int> w,x,d;
-
-void init() {
-    
-    fin >> N >> L;
-
-    w.resize(N);
-    x.resize(N);
-    d.resize(N);
-    for (int i = 0; i < N; i++) {
-        fin >> x[i] >> w[i] >> d[i];
-    }
-    
-    vector<int> inds(N);
-    for (int i = 0; i < N; i++) {
-        inds[i] = i;
-    }
-    sort(inds.begin(),inds.end(),[](int a, int b) { return x[a] < x[b]; });
-    vector<int> W,X,D;
-    for (int t : inds) {
-        W.push_back(w[t]);
-        X.push_back(x[t]);
-        D.push_back(d[t]);
-    }
-    swap(w,W), swap(x,X), swap(d,D);
-}
-
-int getTime() {
-    vector<int> left, right;
-    for (int i = 0; i < N; i++) {
-        if (d[i] == -1) {
-            left.push_back(x[i]);
-        }
-        else {
-            right.push_back(x[i]);
-        }
-    }
-    vector<pair<int,int> > v;
-    for (int i = 0; i < left.size(); i++) {
-        v.push_back({left[i],w[i]});
-    }
-    for (int i = 0; i < right.size(); i++) {
-        v.push_back({L-right[i],w[left.size()+i]});
-    }
-    sort(v.begin(),v.end(), [](pair<int,int> a, pair<int,int> b) { return a.first < b.first; });
-    int total_weight = 0;
-    for (auto t : v) {
-        total_weight += t.second;
-    }
-    for (auto t : v) {
-        total_weight -= 2*t.second;
-        if (total_weight <= 0) {
-            return t.first;
-        }
-    } 
-    return 0;
-}
+struct Cow {
+    int weight;
+    int pos;
+    int speed;
+};
 
 int main() {
-    init();
-    int T = getTime(); 
-    queue<int> right;
-    int meetings = 0;
-    for (int i = 0; i < N; i++) {
-        if (d[i] == -1) {
-            while (!right.empty() && (x[i] - right.front())/2 > T) {
-                right.pop();
-            }
-            meetings += right.size();
-        } else { 
-            right.push(x[i]);
+    ifstream fin("meetings.in");
+    ofstream fout("meetings.out");
+
+    int cow_num;
+    int barn_pos;
+    fin >> cow_num >> barn_pos;
+
+    vector<Cow> cows(cow_num);
+    int total_weight = 0;
+    for (Cow &c : cows) {
+        fin >> c.weight >> c.pos >> c.speed;
+        total_weight += c.weight;
+    }
+
+    sort(cows.begin(), cows.end(),
+              [](const Cow &c1, const Cow &c2) { return c1.pos < c2.pos; });
+
+    // get the cows that start off going to the left & right
+    vector<Cow> left;
+    vector<Cow> right;
+    for (const Cow &c : cows) {
+        if (c.speed == -1) {
+            left.push_back(c);
+        } else if (c.speed == 1) {
+            right.push_back(c);
         }
     }
-    fout << meetings << "\n";
-    return 0;
+
+    /*
+     * calculate each of the times when the cows meet the end
+     * the leftmost cows get all of the -1 cow's positions as their times,
+     * and similarly for the rightmost ones
+     */
+    vector<pair<int, int>> weight_times;
+    for (int c = 0; c < left.size(); c++) {
+        // time of arrivial at barn & weight, respectively
+        weight_times.push_back({left[c].pos, cows[c].weight});
+    }
+    for (int c = 0; c < right.size(); c++) {
+        weight_times.push_back(
+            {barn_pos - right[c].pos, cows[left.size() + c].weight});
+    }
+
+    // sort them by their occurrence
+    sort(weight_times.begin(), weight_times.end(),
+              [](const pair<int, int> &a, const pair<int, int> &b) {
+                  return a.first < b.first;
+              });
+
+    int endTime = -1;
+    for (const auto &[time, weight] : weight_times) {
+        total_weight -= 2 * weight;
+        if (total_weight <= 0) {
+            endTime = time;
+            break;
+        }
+    }
+
+    // count how many meetings occur before the end time
+    int meeting_num = 0;
+    // the cows that a left-going cow can meet before the end time
+    queue<int> leftSide;
+    for (int c = 0; c < cow_num; c++) {
+        if (cows[c].speed == 1) {
+            leftSide.push(cows[c].pos);
+        } else if (cows[c].speed == -1) {
+            // remove all the cows that can't meet this left-going cow
+            while (!leftSide.empty() &&
+                   leftSide.front() + 2 * endTime < cows[c].pos) {
+                leftSide.pop();
+            }
+            meeting_num += leftSide.size();
+        }
+    }
+
+    fout << meeting_num << endl;
 }
