@@ -1,17 +1,14 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-ifstream fin("studying.in");
-ofstream fout("studying.out");
-
 int main() {
 
     int N, X;
-    fin >> N >> X;
+    cin >> N >> X;
 
     vector<int> algorithms(N);
     for (int i = 0; i < N; i++) {
-        fin >> algorithms[i];
+        cin >> algorithms[i];
     }
     sort(algorithms.begin(),algorithms.end());
 
@@ -22,5 +19,5 @@ int main() {
         num++;
     }
 
-    fout << num-1;
+    cout << num-1;
 }
