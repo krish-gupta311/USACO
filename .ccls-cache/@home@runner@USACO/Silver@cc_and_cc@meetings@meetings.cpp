@@ -1,73 +1,78 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-typedef long long ll;
-typedef vector<int> vi; 
-typedef vector<pair<int,int>> vpi; 
-
-#define FOR(i,a,b) for (int i = (a); i < (b); ++i)
-#define F0R(i,a) FOR(i,0,a)
-#define ROF(i,a,b) for (int i = (b)-1; i >= (a); --i)
-#define R0F(i,a) ROF(i,0,a)
-#define trav(a,x) for (auto& a: x)
-
-#define pb push_back
-#define rsz resize
-#define sz(x) int(x.size())
-#define all(x) begin(x), end(x)
-#define f first
-#define s second
-
-int N,L;
-vi w,x,d;
-
-ifstream fin("meetings.in");
-ofstream fout("meetings.out");
-
-void init() {
-    fin >> N >> L;
-    w.rsz(N), x.rsz(N), d.rsz(N);
-    F0R(i,N) fin >> w[i] >> x[i] >> d[i];
-    vi inds(N); iota(all(inds),0);
-    sort(all(inds),[](int a, int b) { return x[a] < x[b]; });
-    vi W,X,D;
-    trav(t,inds) {
-        W.pb(w[t]);
-        X.pb(x[t]);
-        D.pb(d[t]);
-    }
-    swap(w,W), swap(x,X), swap(d,D);
-}
-
-int getTime() {
-    vi lef, rig;
-    F0R(i,N) {
-        if (d[i] == -1) lef.pb(x[i]);
-        else rig.pb(x[i]);
-    }
-    vpi v;
-    F0R(i,sz(lef)) v.pb({lef[i],w[i]});
-    F0R(i,sz(rig)) v.pb({L-rig[i],w[sz(lef)+i]});
-    sort(all(v));
-    int tot = 0; trav(t,v) tot += t.s;
-    trav(t,v) {
-        tot -= 2*t.s;
-        if (tot <= 0) return t.f;
-    }
-    return 0;
-}
+struct Cow {
+    int w; // weight
+    int x; // position
+    int d; // direction
+};
 
 int main() {
-    init();
-    int t = getTime(); 
-    queue<int> rig;
-    int ans = 0;
-    F0R(i,N) {
-        if (d[i] == -1) {
-            while (sz(rig) && rig.front()+2*t < x[i]) rig.pop();
-            ans += sz(rig);
-        } else rig.push(x[i]);
+    ifstream fin("meetings.in");
+    ofstream fout("meetings.out");
+
+    int N; // number of cows
+    int L; // length of the barn
+    fin >> N >> L;
+
+    vector<Cow> cows(N);
+    int total_weight = 0;
+    for (int i = 0; i < N; i++) {
+        fin >> cows[i].w >> cows[i].x >> cows[i].d;
+        total_weight += cows[i].w; // correctly summing up the weight
     }
-    fout << ans << "\n";
+
+    // Sort cows by their position
+    sort(cows.begin(), cows.end(), [](const Cow &a, const Cow &b) { return a.x < b.x; });
+
+    // Separate left-moving and right-moving cows
+    vector<Cow> left;
+    vector<Cow> right;
+    for (const Cow &cow : cows) {
+        if (cow.d == -1) {
+            left.push_back(cow);
+        } else if (cow.d == 1) {
+            right.push_back(cow);
+        }
+    }
+
+    // Calculate the times when cows meet the ends of the barn
+    vector<pair<int, int>> weight_times;
+    for (int i = 0; i < left.size(); i++) {
+        weight_times.push_back({left[i].x, cows[i].w});
+    }
+    for (int i = 0; i < right.size(); i++) {
+        weight_times.push_back({L - right[i].x, cows[left.size()+i].w});
+    }
+
+    // Sort them by their occurrence
+    sort(weight_times.begin(), weight_times.end(), [](const pair<int, int> &a, const pair<int, int> &b) { return a.first < b.first; });
+
+    int T = -1;
+    int accumulated_weight = 0;
+    for (const auto &wt : weight_times) {
+        accumulated_weight += wt.second;
+        if (accumulated_weight * 2 >= total_weight) {
+            T = wt.first;
+            break;
+        }
+    }
+
+    // Count how many meetings occur before time T
+    int meetings = 0;
+    queue<int> moving_right;
+    for (const Cow &cow : cows) {
+        if (cow.d == 1) {
+            moving_right.push(cow.x);
+        } else {
+            while (!moving_right.empty() && moving_right.front() + 2 * T < cow.x) {
+                moving_right.pop();
+            }
+            meetings += moving_right.size();
+        }
+    }
+
+    fout << meetings << endl;
+
     return 0;
 }
