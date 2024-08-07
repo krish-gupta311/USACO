@@ -13,11 +13,11 @@ int main() {
     sort(algorithms.begin(),algorithms.end());
 
     int time = 0;
-    int num = 0;
-    while (time < X) {
-        time += algorithms[num];
+    int num = -1;
+    while (time < X && num + 1 < N) {
+        time += algorithms[num+1];
         num++;
     }
 
-    cout << num-1;
+    cout << num;
 }
