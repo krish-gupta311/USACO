@@ -1,28 +1,23 @@
 #include <bits/stdc++.h>
 using namespace std;
-typedef pair<int,int> pii;
+typedef long long ll;
+typedef pair<ll,ll> pll;
 
 // ifstream fin("tasks.in");
 // ofstream fout("tasks.out");
 
 int main() {
 
-    int N;
+    ll N;
     cin >> N;
-    vector<pii> tasks(N);
-    for (int i = 0; i < N; i++) {
+    vector<pll> tasks(N);
+    for (ll i = 0; i < N; i++) {
         cin >> tasks[i].first >> tasks[i].second;
     }
-    sort(tasks.begin(), tasks.end(), [] (const pii &a, const pii &b) {
-        if (a.first != b.first) {
-            return a.first < b.first;
-        } else {
-            return a.second > b.second;
-        }
-    });
+    sort(tasks.begin(), tasks.end(), [] (const pii &a, const pii &b) { a.first < b.first; });
 
-    int time = 0;
-    int reward = 0;
+    ll time = 0;
+    ll reward = 0;
     for (const pii &task : tasks) {
         time += task.first;
         reward += task.second - time;
