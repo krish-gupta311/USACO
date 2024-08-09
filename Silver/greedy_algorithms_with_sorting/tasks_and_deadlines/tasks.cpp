@@ -13,7 +13,13 @@ int main() {
     for (int i = 0; i < N; i++) {
         cin >> tasks[i].first >> tasks[i].second;
     }
-    sort(tasks.begin(), tasks.end(), [] (const pii &a, const pii &b) { return a.first < b.first; });
+    sort(tasks.begin(), tasks.end(), [] (const pii &a, const pii &b) {
+        if (a.first != b.first) {
+            return a.first < b.first;
+        } else {
+            return a.second > b.second;
+        }
+    });
 
     int time = 0;
     int reward = 0;
