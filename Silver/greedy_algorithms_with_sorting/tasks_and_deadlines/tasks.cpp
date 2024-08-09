@@ -14,11 +14,11 @@ int main() {
     for (ll i = 0; i < N; i++) {
         cin >> tasks[i].first >> tasks[i].second;
     }
-    sort(tasks.begin(), tasks.end(), [] (const pii &a, const pii &b) { a.first < b.first; });
+    sort(tasks.begin(), tasks.end(), [] (const pll &a, const pll &b) { return a.first < b.first; });
 
     ll time = 0;
     ll reward = 0;
-    for (const pii &task : tasks) {
+    for (const pll &task : tasks) {
         time += task.first;
         reward += task.second - time;
     }
