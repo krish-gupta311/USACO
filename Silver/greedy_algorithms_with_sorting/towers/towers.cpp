@@ -20,16 +20,11 @@ int main() {
         if (towers.empty()) {
             towers.push_back(cube);
         } else {
-            bool isBroken = false;
-            for (int i = 0; i < towers.size(); i++) {
-                if (towers[i] > cube) {
-                    towers[i] = cube;
-                    isBroken = true;
-                    break;
-                }
-            }
-            if (!isBroken) {
+            auto it = upper_bound(towers.begin(), towers.end(), cube);
+            if (it == towers.end()) {
                 towers.push_back(cube);
+            } else {
+                towers[it - towers.begin()] = cube;
             }
         }
     }
