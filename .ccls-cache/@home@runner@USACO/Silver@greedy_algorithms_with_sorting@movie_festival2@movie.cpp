@@ -24,7 +24,7 @@ int main() {
     int movies_watched = 0;
     for (const auto &movie : movies) {
         if (!endpoints.empty()) {
-            auto it = upper_bound(endpoints.begin(),endpoints.end(),movie.first);
+            auto it = lower_bound(endpoints.begin(),endpoints.end(),movie.first);
             if (it != endpoints.end()) {
                 avail += it - endpoints.begin();
                 vector<ll> sub_vec(it,endpoints.begin()+endpoints.size());
