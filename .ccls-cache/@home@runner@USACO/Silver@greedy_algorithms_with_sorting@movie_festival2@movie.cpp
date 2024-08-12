@@ -3,17 +3,17 @@ using namespace std;
 typedef long long ll;
 typedef pair<ll,ll> pll;
 
-ifstream fin("movie.in");
-ofstream fout("movie.out");
+// ifstream fin("movie.in");
+// ofstream fout("movie.out");
 
 int main() {
 
     int N, K;
-    fin >> N >> K;
+    cin >> N >> K;
 
     vector<pll> movies(N);
     for (int i = 0; i < N; i++) {
-        fin >> movies[i].first >> movies[i].second;
+        cin >> movies[i].first >> movies[i].second;
     }
     sort(movies.begin(),movies.end(),[] (const pll &a, const pll &b) {
         return a.second < b.second;
@@ -41,7 +41,7 @@ int main() {
         }    
     }
 
-    fout << movies_watched << endl;
+    cout << movies_watched << endl;
 
     return 0;
     
