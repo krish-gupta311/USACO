@@ -10,7 +10,7 @@ int main() {
     fin >> N;
 
     set<int> bessie;
-    for (int i = 0; i < 2*N; i++) {
+    for (int i = 1; i < 2*N+1; i++) {
         bessie.insert(i);
     }
     vector<int> elsie;
@@ -20,7 +20,7 @@ int main() {
         elsie.push_back(card);
         bessie.erase(card);
     }
-
+    
     int wins = 0;
     for (const int card : elsie) {
         auto it = bessie.upper_bound(card);
