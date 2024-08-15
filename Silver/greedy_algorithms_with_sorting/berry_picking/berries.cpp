@@ -9,39 +9,38 @@ int main() {
     int N,K;
     fin >> N >> K;
 
-    vector<int> trees;
-    for (int i = 0; i < K; i++) {
-        int t;
-        fin >> t;
-        trees.push_back(t);
+    vector<int> trees(N);
+    for (int i = 0; i < N; i++) {
+        fin >> trees[i];
     }
-    sort(trees.begin(),trees.end(),greater<int>());
-    vector<int> new_trees(trees.begin(),trees.begin()+K);
-    trees = new_trees;
 
     int max_berries = 0;
-    for (int basket_size = 1; basket_size <= trees[0]; basket_size++) {
-        vector<int> baskets(K);
-        int index_ = 0;
-        for (int i = 0; i < K; i++) {
-            if (trees[i] > basket_size) {
-                for (int j = 0; j < floor(trees[i]/basket_size); j++) {
-                    baskets[index_] = basket_size;
-                    index_++;
-                }
-            } else {
-                baskets[index_] = trees[i];
-                index_++;
+    for (int basket_size = 1; basket_size <= 1000; basket_size++) {
+        
+        vector<int> baskets;
+        for (int i = 0; i < N; i++) {
+            int count = trees[i] / basket_size;
+            for (int j = 0; j < count; j++) {
+                baskets.push_back(basket_size);
+            }
+            int remainder = trees[i] % basket_size;
+            if (remainder > 0) {
+                baskets.push_back(remainder);
             }
         }
-        sort(baskets.begin(),baskets.end());
-        int berries = 0;
-        for (int i = 0; i < K/2; i++) {
-            berries += baskets[i];
+
+        sort(baskets.rbegin(), baskets.rend());
+
+        int berries_total = 0;
+        for (int i = K / 2; i < min(K, (int)baskets.size()); i++) {
+            berries_total += baskets[i];
         }
-        max_berries = max(max_berries,berries);
+
+        max_berries = max(max_berries, berries_total);
     }
 
     fout << max_berries << endl;
+
+    return 0;
     
 }
