@@ -2,8 +2,8 @@
 using namespace std;
 typedef long long ll;
 
-ifstream fin("maximum_median.in");
-ofstream fout("maximum_median.out");
+// ifstream fin("maximum_median.in");
+// ofstream fout("maximum_median.out");
 
 ll last_true(ll lo, ll hi, function<bool(ll)> f) {
 
@@ -24,11 +24,11 @@ int main() {
 
     int N;
     ll K;
-    fin >> N >> K;
+    cin >> N >> K;
 
     vector<ll> arr(N);
     for (int i = 0; i < N; i++) {
-        fin >> arr[i];
+        cin >> arr[i];
     }
     sort(arr.begin(),arr.end());
 
@@ -40,6 +40,6 @@ int main() {
         return opps <= K;
     }); 
 
-    fout << max_median << endl;
+    cout << max_median << endl;
     
 }
