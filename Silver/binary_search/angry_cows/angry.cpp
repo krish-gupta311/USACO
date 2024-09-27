@@ -5,48 +5,41 @@ typedef long long ll;
 ifstream fin("angry.in");
 ofstream fout("angry.out");
 
-ll first_true(ll lo, ll hi, function<bool(ll)> f) {
-    
-    lo--;
-    while (lo < hi) {
-        ll mid = lo + (hi - lo + 1) / 2;
-        if (f(mid)) {
-            hi = mid;
-        } else {
-            lo = mid + 1;
-        }
+int main() {
+
+    int n, k;
+    fin >> n >> k; 
+
+    vector<ll> locations(n);
+    for (int i = 0; i < n; i++) {
+        fin >> locations[i];
     }
-    return lo;
-    
-}
 
-int main () {
+    sort(locations.begin(), locations.end());
 
-    int N, K;
-    fin >> N >> K;
+    ll min = 0; 
+    ll max = locations[n-1];
+    while (min < max) {
+        ll mid = (min + max) / 2; 
+        int used = 0;
+        ll last = 0;
 
-    vector<ll> hay_bales(N);
-    for (int i = 0; i < N; i++) {
-        fin >> hay_bales[i];
-    }
-    sort(hay_bales.begin(),hay_bales.end());
-
-    ll min_R = first_true(0,hay_bales[N-1]/2, [&](ll R) {
-
-        ll hay_bale = hay_bales[0];
-        for (int i = 0; i < K; i++) {
-            auto next_bale = upper_bound(hay_bales.begin(),hay_bales.end(),hay_bale + 2*R);
-            if (next_bale == hay_bales.end()) {
-                return true;
+        while (last < n) {
+            used++;
+            ll curr = last + 1;
+            while (curr < n && locations[curr] - locations[last] <= 2 * mid) {
+                curr++;
             }
-            hay_bale = *next_bale;
+            last = curr;
         }
-        
-        return false;
-        
-    });
 
-    fout << min_R << endl;
-    return 0;  
-    
+        if (used <= k) {
+            max = mid;
+        } else {
+            min = mid + 1;
+        }
+    }
+
+    fout << min << endl;
+    return 0;
 }
