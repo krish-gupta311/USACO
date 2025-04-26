@@ -4,6 +4,9 @@
         "vector": "cpp",
         "regex": "cpp",
         "istream": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "variant": "cpp",
+        "queue": "cpp",
+        "unordered_set": "cpp"
     }
 }
